@@ -4,47 +4,72 @@
 
 int main()
 {
-    initscr();
-    start_color();
-    // use_default_colors(); // 필요시 주석 해제
+    initscr();               // Initialize the ncurses screen
+    start_color();           // Enable color functionality
+    noecho();                // Disable echoing of typed characters
+    cbreak();                // Disable line buffering
 
-    // 색상쌍: 글자색, 배경색(터미널 기본 배경)
-    init_pair(1, COLOR_WHITE, -1);   // 빈칸
-    init_pair(2, COLOR_BLUE, -1);    // 벽
-    init_pair(3, COLOR_CYAN, -1);    // 이뮤너블 벽
-    init_pair(4, COLOR_YELLOW, -1);  // 머리
-    init_pair(5, COLOR_GREEN, -1);   // 몸통
+    // Check if the terminal supports colors
+    if (!has_colors()) {
+        endwin();
+        std::cerr << "Your terminal does not support colors." << std::endl;
+        return 1;
+    }
 
+    // Define a custom gray color if the terminal supports it
+    if (can_change_color()) {
+        init_color(COLOR_BLACK, 500, 500, 500); // Define gray (50% intensity for R, G, B)
+    }
+
+    // Initialize color pairs
+    init_pair(1, COLOR_WHITE, COLOR_BLACK); // Blank with gray background
+    init_pair(2, COLOR_BLUE, COLOR_BLACK);  // Wall with gray background
+    init_pair(3, COLOR_CYAN, COLOR_BLACK);  // Immutable wall with gray background
+    init_pair(4, COLOR_YELLOW, COLOR_BLACK); // Snake's head with gray background
+    init_pair(5, COLOR_GREEN, COLOR_BLACK);  // Snake's body with gray background
+
+    // Set the background color of the entire screen to gray
+    bkgd(COLOR_PAIR(1));
+
+    // Get the map
     auto map = get_map();
     int rows = map.size();
     int cols = map[0].size();
 
-    WINDOW *win = newwin(rows + 2, cols + 2, 0, 0);
-    wbkgd(win, COLOR_PAIR(1));
-    box(win, 0, 0);
-
+    // Draw the map as a square
     for (int i = 0; i < rows; ++i) {
         for (int j = 0; j < cols; ++j) {
             int cell = map[i][j];
-            chtype ch;
+            char ch = ' '; // Default to space for blank cells
             int color = 1;
-            switch(cell) {
-                case 0: ch = ' '; color = 1; break; // 빈칸
-                case 1: ch = '#'; color = 2; break; // 벽
-                case 2: ch = '@'; color = 3; break; // 이뮤너블 벽
-                case 3: ch = 'O'; color = 4; break; // 머리
-                case 4: ch = 'o'; color = 5; break; // 몸통
-                default: ch = '?'; color = 1; break;
+
+            switch (cell) {
+                case 0: ch = ' '; color = 1; break; // Blank
+                case 1: ch = '#'; color = 2; break; // Wall
+                case 2: ch = '#'; color = 3; break; // Immutable wall
+                case 3: ch = '#'; color = 4; break; // Snake's head
+                case 4: ch = '#'; color = 5; break; // Snake's body
+                default: ch = ' '; color = 1; break;
             }
-            wattron(win, COLOR_PAIR(color));
-            mvwaddch(win, i + 1, j + 1, ch);
-            wattroff(win, COLOR_PAIR(color));
+
+            attron(COLOR_PAIR(color));
+            // Scale horizontally by doubling the column index
+            mvaddch(i, j, ch);       // Left part of the box
+            //mvaddch(i, j * 2 + 1, ch);   // Right part of the box
+            attroff(COLOR_PAIR(color));
         }
     }
 
-    wrefresh(win);
+    // Move the pointer to (10, 10)
+    move(10, 10);
+
+    // Refresh the screen to display the map
+    refresh();
+
+    // Wait for user input before exiting
     getch();
-    delwin(win);
+
+    // Cleanup
     endwin();
     return 0;
 }
