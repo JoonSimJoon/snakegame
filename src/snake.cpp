@@ -6,7 +6,7 @@ enum Direction { UP = 0, DOWN, LEFT, RIGHT };
 
 Snake::Snake(int x, int y) {
     body.clear();
-    body.push_back({y, x}); // 머리 좌표 (행, 열)
+    body.push_back({x, y}); // 머리 좌표 (행, 열)
     direction = RIGHT;
     length = 1;
     score = 0;
@@ -27,9 +27,9 @@ void Snake::set_direction(int dir) {
 void Snake::move(int dx, int dy) {
     if (!alive) return;
     // 새 머리 좌표 계산
-    int new_y = body.front().first + dy;
-    int new_x = body.front().second + dx;
-    body.insert(body.begin(), {new_y, new_x});
+    int new_x = body.front().first + dx;
+    int new_y = body.front().second + dy;
+    body.insert(body.begin(), {new_x, new_y});
     // 꼬리 삭제 (grow 시에는 삭제하지 않음)
     if ((int)body.size() > length)
         body.pop_back();

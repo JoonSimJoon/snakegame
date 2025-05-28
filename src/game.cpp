@@ -105,10 +105,10 @@ void Game::update_state() {
     // 현재 방향에 따라 dx, dy 결정
     int dx = 0, dy = 0;
     switch (snake.get_direction()) {
-        case UP:    dy = -1; break;
-        case DOWN:  dy = 1;  break;
-        case LEFT:  dx = -1; break;
-        case RIGHT: dx = 1;  break;
+        case UP:    dx = -1; break;
+        case DOWN:  dx = 1;  break;
+        case LEFT:  dy = -1; break;
+        case RIGHT: dy = 1;  break;
     }
 
     // 뱀 이동
@@ -181,29 +181,32 @@ void Game::game_over() {
 bool Game::snake_alive() const {
     return snake.get_alive();
 }
-
 void Game::run() {
-    reset();            // 맵, 뱀, 점수 등 초기화
-    init_screen();      // ncurses 및 화면 초기화
-    nodelay(stdscr, TRUE); // getch가 블로킹되지 않도록 설정
-    keypad(stdscr, TRUE);  // 방향키 입력 허용
+    reset();
+    init_screen();
+    nodelay(stdscr, TRUE);
+    keypad(stdscr, TRUE);
 
     is_running = true;
     while (is_running) {
-        process_input();    // 사용자 입력 처리
-        update_state();     // 게임 상태 갱신
-        update_screen();    // 화면 갱신
+        process_input();
+        update_state();
+        update_screen();
 
-        // 충돌 시 게임 종료
+        // 디버깅: snake_alive 상태와 뱀 머리 좌표, alive 상태 출력
+        auto head = snake.get_head();
+        mvprintw(0, 0, "snake_alive: %d, head: (%d, %d), alive: %d   ",
+                 snake_alive(), head.first, head.second, snake.get_alive());
+        refresh();
+
         if (!snake_alive()) {
             is_running = false;
             break;
         }
 
-        napms(100); // 게임 속도 조절 (100ms 대기)
+        napms(300);
     }
-    game_over(); // 게임 오버 화면 및 종료 처리
+    game_over();
 }
-
 // snake_alive()는 snake가 살아있는지 반환하는 함수로, 아래처럼 구현할 수 있습니다.
 // bool Game::snake_alive() const { return snake.is_alive(); }

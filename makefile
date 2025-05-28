@@ -2,7 +2,7 @@ CXX = g++
 CXXFLAGS = -Wall -Wextra -std=c++17 -I../include -I./include
 LDFLAGS = -lncurses
 
-SRC_DIR = .
+SRC_DIR = src
 SRCS = $(SRC_DIR)/main.cpp \
        $(SRC_DIR)/map.cpp \
        $(SRC_DIR)/snake.cpp \
