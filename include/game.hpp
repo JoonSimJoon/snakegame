@@ -21,6 +21,8 @@ private:
     Snake snake;
     Map map;
     bool is_running;
+    bool Quit=false;
     int score;
+
     // 기타 상태 변수
 };

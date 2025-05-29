@@ -95,6 +95,7 @@ void Game::process_input() {
             break;
         case 'q':
             is_running = false; // 게임 종료
+            Quit = true;
             break;
         default:
             break;
@@ -109,6 +110,16 @@ void Game::update_state() {
         case DOWN:  dx = 1;  break;
         case LEFT:  dy = -1; break;
         case RIGHT: dy = 1;  break;
+    }
+
+    // 이전 뱀 위치를 맵에서 지움 (몸통, 머리 모두)
+    for (const auto& part : snake.get_body()) {
+        int x = part.first;
+        int y = part.second;
+        if (x >= 0 && x < map.getHeight() && y >= 0 && y < map.getWidth()) {
+            if (map.getMapData()[x][y] == 3 || map.getMapData()[x][y] == 4)
+                map.getMapData()[x][y] = 0; // 빈 칸으로
+        }
     }
 
     // 뱀 이동
@@ -135,6 +146,19 @@ void Game::update_state() {
     if (map.getMapData()[head.first][head.second] == 5) {
         snake.grow();
         // 아이템 재배치 등 추가 로직 필요
+    }
+
+    // 뱀의 새로운 위치를 맵에 표시 (머리: 3, 몸통: 4)
+    const auto& body = snake.get_body();
+    for (size_t i = 0; i < body.size(); ++i) {
+        int x= body[i].first;
+        int y = body[i].second;
+        if (x >= 0 && x < map.getHeight() && y >= 0 && y < map.getWidth()) {
+            if (i == 0)
+                map.getMapData()[x][y] = 3; // 머리
+            else
+                map.getMapData()[x][y] = 4; // 몸통
+        }
     }
 }
 
@@ -175,6 +199,9 @@ void Game::game_over() {
     refresh();
     getch(); // 아무 키나 누를 때까지 대기
     endwin(); // ncurses 종료
+    if(Quit) {
+        std::cout<<"강제종료\n";
+    }
     std::cout << "최종 점수: " << score << std::endl;
 }
 

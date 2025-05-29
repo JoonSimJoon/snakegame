@@ -16,6 +16,7 @@ class Snake{
         std::pair<int, int> get_head() const { return body.front(); } // 머리 좌표 반환
         void set_alive(bool val) { alive = val; }
         bool get_alive() const { return alive; } // 생존 여부 반환
+        const std::vector<std::pair<int, int>>& get_body() const { return body; }
         // 기타 뱀 관련 메소드
     private:
         std::vector<std::pair<int, int>> body; // 뱀의 몸통 좌표
