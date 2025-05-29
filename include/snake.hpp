@@ -2,12 +2,14 @@
 
 #include <vector>
 #include <utility>
+#include "map.hpp"
 
 
 class Snake{
     public:
         Snake() : direction(0), length(1), score(0), alive(true) {} // 기본 생성자
         Snake(int x, int y);
+        Snake(const Map& map);
         void move(int dx, int dy);
         void grow();
         bool check_collision();

@@ -13,6 +13,26 @@ Snake::Snake(int x, int y) {
     alive = true;
 }
 
+// 맵에서 3(머리), 4(몸통)인 좌표를 찾아 뱀을 초기화
+Snake::Snake(const Map& map) {
+    body.clear();
+    for (int x = 0; x < map.getWidth(); ++x) {
+        for (int y = 0; y < map.getHeight(); ++y) {
+            int cell = map.getMapData()[x][y];
+            if (cell == 3) {
+                body.insert(body.begin(), {x, y}); // 머리는 맨 앞에
+            } else if (cell == 4) {
+                body.push_back({x, y}); // 몸통은 뒤에
+            }
+        }
+    }
+    direction = LEFT; // 기본 방향
+    length = body.size();
+    score = 0;
+    alive = true;
+}
+
+
 void Snake::set_direction(int dir) {
     // 반대 방향으로는 이동 불가
     if ((direction == UP && dir == DOWN) ||

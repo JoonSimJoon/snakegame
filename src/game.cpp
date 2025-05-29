@@ -184,12 +184,17 @@ bool Game::check_collision() {
 }
 
 void Game::reset() {
-    // 맵과 뱀을 초기 상태로 재설정
-    map.generate(); // 맵 재생성 (맵 크기 등은 필요시 생성자에서 관리)
-    snake = Snake(map.getWidth() / 2, map.getHeight() / 2); // 중앙에서 시작
+    map.generate();
+    // int x = map.getWidth() / 2;
+    // int y = map.getHeight() / 2;
+    // snake = Snake(x, y); // (x, y) 좌표계로 중앙에 뱀 생성
+    // snake.set_direction(LEFT); // 시작 방향을 LEFT로 설정
+    snake = Snake(map);
     is_running = true;
     score = 0;
 }
+
+
 
 
 void Game::game_over() {
@@ -221,9 +226,9 @@ void Game::run() {
         update_screen();
 
         // 디버깅: snake_alive 상태와 뱀 머리 좌표, alive 상태 출력
-        auto head = snake.get_head();
-        mvprintw(0, 0, "snake_alive: %d, head: (%d, %d), alive: %d   ",
-                 snake_alive(), head.first, head.second, snake.get_alive());
+        //auto head = snake.get_head();
+        //mvprintw(0, 0, "snake_alive: %d, head: (%d, %d), alive: %d   ",
+        //         snake_alive(), head.first, head.second, snake.get_alive());
         refresh();
 
         if (!snake_alive()) {
