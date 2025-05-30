@@ -38,6 +38,8 @@ void Game::init_screen() {
     init_pair(3, COLOR_CYAN, COLOR_BLACK);  // 고정 벽
     init_pair(4, COLOR_YELLOW, COLOR_BLACK); // 뱀 머리
     init_pair(5, COLOR_GREEN, COLOR_BLACK);  // 뱀 몸통
+    init_pair(6, COLOR_BLACK, COLOR_BLACK);  // 사과
+    
 
     // 전체 배경색 지정
     bkgd(COLOR_PAIR(1));
@@ -64,6 +66,7 @@ void Game::update_screen() {
                 case 2: ch = '#'; color = 3; break; // 고정 벽
                 case 3: ch = '#'; color = 4; break; // 뱀 머리
                 case 4: ch = '#'; color = 5; break; // 뱀 몸통
+                case 5: ch = '#'; color = 6; break; // 뱀 몸통
                 default: ch = ' '; color = 1; break;
             }
 
@@ -77,23 +80,31 @@ void Game::update_screen() {
     refresh(); // 화면 갱신
 }
 
-
 void Game::process_input() {
     int ch = getch();
-    switch (std::tolower(ch)) {
+    switch (ch) {
         case 'w':
+        case 'W':
+        case KEY_UP:
             snake.set_direction(UP);
             break;
         case 'a':
+        case 'A':
+        case KEY_LEFT:
             snake.set_direction(LEFT);
             break;
         case 's':
+        case 'S':
+        case KEY_DOWN:
             snake.set_direction(DOWN);
             break;
         case 'd':
+        case 'D':
+        case KEY_RIGHT:
             snake.set_direction(RIGHT);
             break;
         case 'q':
+        case 'Q':
             is_running = false; // 게임 종료
             Quit = true;
             break;
@@ -142,16 +153,19 @@ void Game::update_state() {
         return;
     }
 
-    // 열매(아이템) 먹었는지 검사 (예시: 5번 셀에 열매가 있다고 가정)
+    // 사과(아이템) 먹었는지 검사 (예시: 5번 셀에 열매가 있다고 가정)
+    bool ate_apple = false;
     if (map.getMapData()[head.first][head.second] == 5) {
         snake.grow();
-        // 아이템 재배치 등 추가 로직 필요
+        ate_apple = true;
+        // 디버깅: 사과를 먹은 위치 출력
+        mvprintw(0, 0, "사과 먹음! 위치: (%d, %d)   ", head.first, head.second);
     }
 
     // 뱀의 새로운 위치를 맵에 표시 (머리: 3, 몸통: 4)
     const auto& body = snake.get_body();
     for (size_t i = 0; i < body.size(); ++i) {
-        int x= body[i].first;
+        int x = body[i].first;
         int y = body[i].second;
         if (x >= 0 && x < map.getHeight() && y >= 0 && y < map.getWidth()) {
             if (i == 0)
@@ -159,6 +173,23 @@ void Game::update_state() {
             else
                 map.getMapData()[x][y] = 4; // 몸통
         }
+    }
+
+    // 사과를 먹었다면, 다음 프레임에 새 사과 생성
+    if (ate_apple) {
+        int apple_x = -1, apple_y = -1;
+        while (true) {
+            int x = rand() % map.getWidth();
+            int y = rand() % map.getHeight();
+            if (map.getMapData()[x][y] == 0) {
+                map.getMapData()[x][y] = 5; // 새 사과 생성
+                apple_x = x;
+                apple_y = y;
+                break;
+            }
+        }
+        // 디버깅: 새 사과 생성 위치 출력
+        mvprintw(1, 0, "새 사과 생성 위치: (%d, %d)   ", apple_x, apple_y);
     }
 }
 
@@ -185,13 +216,20 @@ bool Game::check_collision() {
 
 void Game::reset() {
     map.generate();
-    // int x = map.getWidth() / 2;
-    // int y = map.getHeight() / 2;
-    // snake = Snake(x, y); // (x, y) 좌표계로 중앙에 뱀 생성
-    // snake.set_direction(LEFT); // 시작 방향을 LEFT로 설정
     snake = Snake(map);
     is_running = true;
     score = 0;
+
+    // 사과(아이템) 생성: 1프레임 이후 맵의 빈 공간(0) 중 랜덤 위치에 5로 저장
+    srand(static_cast<unsigned int>(time(nullptr)));
+    while (true) {
+        int x = rand() % (map.getWidth()-2);
+        int y = rand() % (map.getHeight()-2);
+        if (map.getMapData()[x+1][y+1] == 0) {
+            map.getMapData()[x+1][y+1] = 5; // 사과 생성
+            break;
+        }
+    }
 }
 
 
