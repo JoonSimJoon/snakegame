@@ -19,6 +19,7 @@ class Snake{
         void set_alive(bool val) { alive = val; }
         bool get_alive() const { return alive; } // 생존 여부 반환
         const std::vector<std::pair<int, int>>& get_body() const { return body; }
+        void shrink();
         // 기타 뱀 관련 메소드
     private:
         std::vector<std::pair<int, int>> body; // 뱀의 몸통 좌표

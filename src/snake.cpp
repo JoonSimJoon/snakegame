@@ -72,3 +72,11 @@ bool Snake::check_collision() {
     }
     return false;
 }
+
+// snake.cpp
+void Snake::shrink() {
+    if (body.size() > 1) {
+        body.pop_back();
+        length--;
+    }
+}

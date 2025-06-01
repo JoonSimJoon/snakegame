@@ -38,7 +38,8 @@ void Game::init_screen() {
     init_pair(3, COLOR_CYAN, COLOR_BLACK);  // 고정 벽
     init_pair(4, COLOR_YELLOW, COLOR_BLACK); // 뱀 머리
     init_pair(5, COLOR_GREEN, COLOR_BLACK);  // 뱀 몸통
-    init_pair(6, COLOR_BLACK, COLOR_BLACK);  // 사과
+    init_pair(6, COLOR_MAGENTA, COLOR_BLACK);  // 사과
+    init_pair(7, COLOR_RED, COLOR_BLACK);  // 독사과
     
 
     // 전체 배경색 지정
@@ -66,7 +67,8 @@ void Game::update_screen() {
                 case 2: ch = '#'; color = 3; break; // 고정 벽
                 case 3: ch = '#'; color = 4; break; // 뱀 머리
                 case 4: ch = '#'; color = 5; break; // 뱀 몸통
-                case 5: ch = '#'; color = 6; break; // 뱀 몸통
+                case 5: ch = '#'; color = 6; break; // 사과
+                case 6: ch = '#'; color = 7; break; // 독사과
                 default: ch = ' '; color = 1; break;
             }
 
@@ -153,13 +155,25 @@ void Game::update_state() {
         return;
     }
 
-    // 사과(아이템) 먹었는지 검사 (예시: 5번 셀에 열매가 있다고 가정)
+    // 아이템 먹었는지 검사
     bool ate_apple = false;
-    if (map.getMapData()[head.first][head.second] == 5) {
+    bool ate_poison = false;
+    if (map.getMapData()[head.first][head.second] == 5) { // 사과
         snake.grow();
         ate_apple = true;
-        // 디버깅: 사과를 먹은 위치 출력
+        score++;
         mvprintw(0, 0, "사과 먹음! 위치: (%d, %d)   ", head.first, head.second);
+    } else if (map.getMapData()[head.first][head.second] == 6) { // 독사과
+        // 뱀의 길이가 1보다 크면 줄임
+        if (snake.get_body().size() > 1) {
+            snake.shrink(); // shrink()는 뱀의 길이를 1 줄이는 함수로 아래 참고
+        }
+        else{
+            is_running = false;
+            return;
+        }
+        ate_poison = true;
+        mvprintw(0, 0, "독사과 먹음! 위치: (%d, %d)   ", head.first, head.second);
     }
 
     // 뱀의 새로운 위치를 맵에 표시 (머리: 3, 몸통: 4)
@@ -188,8 +202,23 @@ void Game::update_state() {
                 break;
             }
         }
-        // 디버깅: 새 사과 생성 위치 출력
         mvprintw(1, 0, "새 사과 생성 위치: (%d, %d)   ", apple_x, apple_y);
+    }
+
+    // 독사과를 먹었다면, 다음 프레임에 새 독사과 생성
+    if (ate_poison) {
+        int poison_x = -1, poison_y = -1;
+        while (true) {
+            int x = rand() % map.getWidth();
+            int y = rand() % map.getHeight();
+            if (map.getMapData()[x][y] == 0) {
+                map.getMapData()[x][y] = 6; // 새 독사과 생성
+                poison_x = x;
+                poison_y = y;
+                break;
+            }
+        }
+        mvprintw(2, 0, "새 독사과 생성 위치: (%d, %d)   ", poison_x, poison_y);
     }
 }
 
@@ -227,6 +256,15 @@ void Game::reset() {
         int y = rand() % (map.getHeight()-2);
         if (map.getMapData()[x+1][y+1] == 0) {
             map.getMapData()[x+1][y+1] = 5; // 사과 생성
+            break;
+        }
+    }
+    srand(static_cast<unsigned int>(time(nullptr)));
+    while (true) {
+        int x = rand() % (map.getWidth()-2);
+        int y = rand() % (map.getHeight()-2);
+        if (map.getMapData()[x+1][y+1] == 0) {
+            map.getMapData()[x+1][y+1] = 6; // 독사과 생성
             break;
         }
     }
