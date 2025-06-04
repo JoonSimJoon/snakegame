@@ -79,5 +79,9 @@ void Snake::shrink() {
     if (body.size() > 1) {
         body.pop_back();
         length--;
+        // 길이가 3보다 작아지면 게임 오버
+        if (length < 3) {
+            alive = false;
+        }
     }
 }
