@@ -39,6 +39,7 @@ void Snake::set_direction(int dir) {
         (direction == DOWN && dir == UP) ||
         (direction == LEFT && dir == RIGHT) ||
         (direction == RIGHT && dir == LEFT)) {
+        alive = false;
         return;
     }
     direction = dir;

@@ -312,7 +312,7 @@ void Game::run() {
             break;
         }
 
-        napms(300);
+        napms(100);
     }
     game_over();
 }
