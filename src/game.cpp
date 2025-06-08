@@ -1,6 +1,7 @@
 #include "game.hpp"
 #include <iostream>
 #include <ncurses.h>
+#include <chrono>
 
 Map map; // Declare a global map object
 Snake snake; // Declare a global snake object
@@ -207,18 +208,7 @@ void Game::update_state() {
 
     // 독사과를 먹었다면, 다음 프레임에 새 독사과 생성
     if (ate_poison) {
-        int poison_x = -1, poison_y = -1;
-        while (true) {
-            int x = rand() % map.getWidth();
-            int y = rand() % map.getHeight();
-            if (map.getMapData()[x][y] == 0) {
-                map.getMapData()[x][y] = 6; // 새 독사과 생성
-                poison_x = x;
-                poison_y = y;
-                break;
-            }
-        }
-        mvprintw(2, 0, "새 독사과 생성 위치: (%d, %d)   ", poison_x, poison_y);
+       spawn_poison();
     }
 }
 
@@ -259,18 +249,21 @@ void Game::reset() {
             break;
         }
     }
-    srand(static_cast<unsigned int>(time(nullptr)));
+    spawn_poison();
+}
+
+void Game::spawn_poison() {
     while (true) {
-        int x = rand() % (map.getWidth()-2);
-        int y = rand() % (map.getHeight()-2);
-        if (map.getMapData()[x+1][y+1] == 0) {
-            map.getMapData()[x+1][y+1] = 6; // 독사과 생성
+        int x = rand() % map.getWidth();
+        int y = rand() % map.getHeight();
+        if (map.getMapData()[x][y] == 0) {
+            map.getMapData()[x][y] = 6;
+            poison_pos = {x, y};
+            poison_time = std::chrono::steady_clock::now();
             break;
         }
     }
 }
-
-
 
 
 void Game::game_over() {
