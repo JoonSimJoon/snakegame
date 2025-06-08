@@ -8,7 +8,9 @@ BIN_DIR = bin
 SRCS = $(SRC_DIR)/main.cpp \
        $(SRC_DIR)/map.cpp \
        $(SRC_DIR)/snake.cpp \
-       $(SRC_DIR)/game.cpp
+       $(SRC_DIR)/contents.cpp \
+	   $(SRC_DIR)/game.cpp
+
 
 OBJS = $(SRCS:$(SRC_DIR)/%.cpp=$(BIN_DIR)/%.o)
 TARGET = snakegame

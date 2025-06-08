@@ -5,7 +5,30 @@
 
 Map map; // Declare a global map object
 Snake snake; // Declare a global snake object
+Contents contents;
 enum Direction { UP = 0, DOWN, LEFT, RIGHT };
+
+std::pair<int, int> poison_pos;
+std::chrono::steady_clock::time_point poison_time;
+int cur_len = 0, max_len = 0;
+int growth_cnt = 0, poison_cnt = 0, gate_cnt = 0;
+bool len_ok = false, growth_ok = false, poison_ok = false, gate_ok = false;
+
+// 상태/미션 값 갱신 함수
+void Game::update_contents_val() {
+    cur_len = snake.get_body().size();
+    if (cur_len > max_len) max_len = cur_len;
+
+    // 미션 달성 조건 예시 (원하는 값으로 수정)
+    len_ok = (cur_len >= 10);
+    growth_ok = (growth_cnt >= 5);
+    poison_ok = (poison_cnt >= 2);
+    gate_ok = (gate_cnt >= 1);
+
+    contents.set_status(cur_len, max_len, growth_cnt, poison_cnt, gate_cnt);
+    contents.set_mission(10, 5, 2, 1, len_ok, growth_ok, poison_ok, gate_ok);
+}
+
 
 
 Game::Game()
@@ -79,6 +102,11 @@ void Game::update_screen() {
             attroff(COLOR_PAIR(color));
         }
     }
+    // 상태 갱신 (현재 길이, 최대 길이, 성장, 독, 게이트 횟수)
+    update_contents_val();
+
+    // 스코어보드+미션 출력
+    contents.draw(map.getWidth() * 2 + 2, 2);
 
     refresh(); // 화면 갱신
 }
@@ -278,6 +306,8 @@ void Game::game_over() {
     }
     std::cout << "최종 점수: " << score << std::endl;
 }
+
+
 
 bool Game::snake_alive() const {
     return snake.get_alive();

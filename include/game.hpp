@@ -1,10 +1,11 @@
 #pragma once
 #include "snake.hpp"
 #include "map.hpp"
+#include "contents.hpp"
 // game.hpp에 멤버 변수 추가
 #include <chrono>
-std::pair<int, int> poison_pos;
-std::chrono::steady_clock::time_point poison_time;
+extern std::pair<int, int> poison_pos;
+extern std::chrono::steady_clock::time_point poison_time;
 
 class Game {
 public:
@@ -23,6 +24,7 @@ private:
     void game_over();           // 게임 오버 처리
     //void show_score();          // 점수 표시
     bool snake_alive() const; // 뱀의 생존 여부 확인
+    void update_contents_val();
     Snake snake;
     Map map;
     bool is_running;
