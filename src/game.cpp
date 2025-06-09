@@ -188,11 +188,13 @@ void Game::update_state() {
     bool ate_apple = false;
     bool ate_poison = false;
     if (map.getMapData()[head.first][head.second] == 5) { // 사과
+        growth_cnt++;
         snake.grow();
         ate_apple = true;
         score++;
         mvprintw(0, 0, "사과 먹음! 위치: (%d, %d)   ", head.first, head.second);
     } else if (map.getMapData()[head.first][head.second] == 6) { // 독사과
+        poison_cnt++;
         // 뱀의 길이가 1보다 크면 줄임
         if (snake.get_body().size() > 1) {
             snake.shrink(); // shrink()는 뱀의 길이를 1 줄이는 함수로 아래 참고
