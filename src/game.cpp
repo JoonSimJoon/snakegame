@@ -2,6 +2,9 @@
 #include <iostream>
 #include <ncurses.h>
 #include <chrono>
+#define COLOR_ORANGE 8
+#define COLOR_GRAY 9
+
 
 Map map; // Declare a global map object
 Snake snake; // Declare a global snake object
@@ -53,18 +56,21 @@ void Game::init_screen() {
 
     // 터미널이 컬러 변경 지원 시, 회색 정의
     if (can_change_color()) {
-        init_color(COLOR_BLACK, 500, 500, 500); // 회색 (R,G,B 50%)
+        init_color(COLOR_GRAY, 500, 500, 500); // 회색 (R,G,B 50%)
+        init_color(COLOR_ORANGE, 1000, 647, 0);
+        init_color(COLOR_BLACK, 0, 0, 0); // 검정색
     }
 
+
     // 컬러 페어 초기화
-    init_pair(1, COLOR_WHITE, COLOR_BLACK); // 빈 칸
-    init_pair(2, COLOR_BLUE, COLOR_BLACK);  // 벽
-    init_pair(3, COLOR_CYAN, COLOR_BLACK);  // 고정 벽
-    init_pair(4, COLOR_YELLOW, COLOR_BLACK); // 뱀 머리
-    init_pair(5, COLOR_GREEN, COLOR_BLACK);  // 뱀 몸통
-    init_pair(6, COLOR_MAGENTA, COLOR_BLACK);  // 사과
-    init_pair(7, COLOR_RED, COLOR_BLACK);  // 독사과
-    
+    init_pair(1, COLOR_WHITE, COLOR_WHITE); // 빈 칸
+    init_pair(2, COLOR_BLACK , COLOR_GRAY);  // 벽
+    init_pair(3, COLOR_BLACK , COLOR_BLACK);  // 고정 벽
+    init_pair(4, COLOR_BLACK , COLOR_YELLOW); // 뱀 머리
+    init_pair(5, COLOR_BLACK , COLOR_ORANGE);  // 뱀 몸통
+    init_pair(6, COLOR_BLACK , COLOR_GREEN);  // 사과
+    init_pair(7, COLOR_BLACK, COLOR_RED);  // 독사과
+    //init_pair(8, COLOR_BL, COLOR_BLACK); // 상태/미션 표시
 
     // 전체 배경색 지정
     bkgd(COLOR_PAIR(1));
@@ -87,12 +93,12 @@ void Game::update_screen() {
 
             switch (cell) {
                 case 0: ch = ' '; color = 1; break; // 빈 칸
-                case 1: ch = '#'; color = 2; break; // 벽
-                case 2: ch = '#'; color = 3; break; // 고정 벽
-                case 3: ch = '#'; color = 4; break; // 뱀 머리
-                case 4: ch = '#'; color = 5; break; // 뱀 몸통
-                case 5: ch = '#'; color = 6; break; // 사과
-                case 6: ch = '#'; color = 7; break; // 독사과
+                case 1: ch = ' '; color = 2; break; // 벽
+                case 2: ch = ' '; color = 3; break; // 고정 벽
+                case 3: ch = ' '; color = 4; break; // 뱀 머리
+                case 4: ch = ' '; color = 5; break; // 뱀 몸통
+                case 5: ch = ' '; color = 6; break; // 사과
+                case 6: ch = ' '; color = 7; break; // 독사과
                 default: ch = ' '; color = 1; break;
             }
 
