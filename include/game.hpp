@@ -2,6 +2,7 @@
 #include "snake.hpp"
 #include "map.hpp"
 #include "contents.hpp"
+#include <gate.hpp>
 // game.hpp에 멤버 변수 추가
 #include <chrono>
 extern std::pair<int, int> poison_pos;
@@ -33,3 +34,7 @@ private:
 
     // 기타 상태 변수
 };
+
+
+
+

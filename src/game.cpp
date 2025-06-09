@@ -9,6 +9,7 @@
 Map map; // Declare a global map object
 Snake snake; // Declare a global snake object
 Contents contents;
+Gate gate;
 enum Direction { UP = 0, DOWN, LEFT, RIGHT };
 
 std::pair<int, int> poison_pos;
@@ -70,7 +71,7 @@ void Game::init_screen() {
     init_pair(5, COLOR_BLACK , COLOR_ORANGE);  // 뱀 몸통
     init_pair(6, COLOR_BLACK , COLOR_GREEN);  // 사과
     init_pair(7, COLOR_BLACK, COLOR_RED);  // 독사과
-    //init_pair(8, COLOR_BL, COLOR_BLACK); // gate
+    init_pair(8, COLOR_BLACK, COLOR_MAGENTA); // gate
     init_pair(9, COLOR_BLACK, COLOR_WHITE); // 검정글자, 흰배경 (글자 잘 보임)
     // 전체 배경색 지정
     bkgd(COLOR_PAIR(1));
@@ -91,16 +92,19 @@ void Game::update_screen() {
             char ch = ' ';
             int color = 1;
 
-            switch (cell) {
-                case 0: ch = ' '; color = 1; break; // 빈 칸
-                case 1: ch = ' '; color = 2; break; // 벽
-                case 2: ch = ' '; color = 3; break; // 고정 벽
-                case 3: ch = ' '; color = 4; break; // 뱀 머리
-                case 4: ch = ' '; color = 5; break; // 뱀 몸통
-                case 5: ch = ' '; color = 6; break; // 사과
-                case 6: ch = ' '; color = 7; break; // 독사과
-                default: ch = ' '; color = 1; break;
-            }
+          
+                switch (cell) {
+                    case 0: ch = ' '; color = 1; break;
+                    case 1: ch = ' '; color = 2; break;
+                    case 2: ch = ' '; color = 3; break;
+                    case 3: ch = ' '; color = 4; break;
+                    case 4: ch = ' '; color = 5; break;
+                    case 5: ch = ' '; color = 6; break;
+                    case 6: ch = ' '; color = 7; break;
+                    case 7: ch = ' '; color = 8; break; // 게이트
+                    default: ch = ' '; color = 1; break;
+                }
+            
 
             attron(COLOR_PAIR(color));
             mvaddch(i, j * 2, ch);
@@ -175,6 +179,22 @@ void Game::update_state() {
 
     // 벽 충돌 검사
     auto head = snake.get_head();
+
+    // 게이트 진입 체크
+     if (gate.is_gate(head.first, head.second)) {
+        // 현재 방향을 전달하여, 출구 앞 좌표와 새로운 방향을 받음
+        auto result = gate.teleport_with_dir(
+            head.first, head.second, snake.get_direction(), map.getMapData());
+
+        // 뱀 머리 좌표를 출구 앞 좌표로 이동
+        snake.set_head(result.first.first, result.first.second);
+
+        // 뱀의 방향도 출구 방향으로 변경
+        snake.set_direction(result.second);
+
+        // 게이트 통과 횟수 증가 등 추가 처리
+        gate_cnt++;
+    }   
     if (head.first < 0 || head.first >= map.getHeight() ||
         head.second < 0 || head.second >= map.getWidth() ||
         map.getMapData()[head.first][head.second] == 1) // 1: 벽
@@ -286,6 +306,8 @@ void Game::reset() {
         }
     }
     spawn_poison();
+    gate.spawn(map.getMapData());
+
 }
 
 void Game::spawn_poison() {

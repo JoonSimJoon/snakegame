@@ -85,3 +85,8 @@ void Snake::shrink() {
         }
     }
 }
+void Snake::set_head(int x, int y) {
+    if (!body.empty()) {
+        body[0] = {x, y};
+    }
+}

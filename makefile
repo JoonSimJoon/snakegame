@@ -9,6 +9,7 @@ SRCS = $(SRC_DIR)/main.cpp \
        $(SRC_DIR)/map.cpp \
        $(SRC_DIR)/snake.cpp \
        $(SRC_DIR)/contents.cpp \
+       $(SRC_DIR)/gate.cpp \
 	   $(SRC_DIR)/game.cpp
 
 
