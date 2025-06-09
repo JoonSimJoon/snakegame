@@ -70,8 +70,8 @@ void Game::init_screen() {
     init_pair(5, COLOR_BLACK , COLOR_ORANGE);  // 뱀 몸통
     init_pair(6, COLOR_BLACK , COLOR_GREEN);  // 사과
     init_pair(7, COLOR_BLACK, COLOR_RED);  // 독사과
-    //init_pair(8, COLOR_BL, COLOR_BLACK); // 상태/미션 표시
-
+    //init_pair(8, COLOR_BL, COLOR_BLACK); // gate
+    init_pair(9, COLOR_BLACK, COLOR_WHITE); // 검정글자, 흰배경 (글자 잘 보임)
     // 전체 배경색 지정
     bkgd(COLOR_PAIR(1));
 }

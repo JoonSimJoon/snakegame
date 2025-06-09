@@ -22,6 +22,8 @@ void Contents::set_mission(int m_len, int m_growth, int m_poison, int m_gate,
 }
 
 void Contents::draw(int x, int y) const {
+     attron(COLOR_PAIR(9)); // 예: 10번 컬러페어(검정글자+흰배경) 사용
+   
     // Score Board
     mvprintw(y, x,   "Score Board");
     mvprintw(y+1, x, "B: %d / %d", cur_length, max_length);
