@@ -76,11 +76,9 @@ bool Gate::is_gate(int x, int y) const {
     return (exists && ((gate1.first == x && gate1.second == y) || (gate2.first == x && gate2.second == y)));
 }
 
-
 std::pair<std::pair<int, int>, int> Gate::teleport_with_dir(
     int in_x, int in_y, int in_dir, const std::vector<std::vector<int>>& map) const
 {
-    // 출구 게이트 정보 선택
     GateInfo out_info;
     if (gate1.first == in_x && gate1.second == in_y)
         out_info = gate_info2;
@@ -92,14 +90,20 @@ std::pair<std::pair<int, int>, int> Gate::teleport_with_dir(
     int gx = out_info.pos.first;
     int gy = out_info.pos.second;
 
-    // 4방향 모두 검사해서 나올 수 있는 곳이 있으면 그 자리와 방향으로 나감
-    for (int dir = 0; dir < 4; ++dir) {
+    // 진입방향, 시계방향, 역시계방향, 반대방향 순서로 검사
+    int try_dir[4];
+    try_dir[0] = in_dir;
+    try_dir[1] = (in_dir + 1) % 4; // 시계방향
+    try_dir[2] = (in_dir + 3) % 4; // 역시계방향
+    try_dir[3] = (in_dir + 2) % 4; // 반대방향
+
+    for (int k = 0; k < 4; ++k) {
+        int dir = try_dir[k];
         int nx = gx + dx[dir];
         int ny = gy + dy[dir];
         if (nx >= 0 && nx < rows && ny >= 0 && ny < cols) {
             int cell = map[nx][ny];
-            // 벽, 뱀 몸통/머리, 게이트가 아니면 이동 가능
-            if (cell != 1 && cell != 3 && cell != 4 && cell != 7) {
+            if (cell != 1 && cell != 2 && cell != 3 && cell != 4 && cell != 7) {
                 return {{nx, ny}, dir};
             }
         }
@@ -107,7 +111,6 @@ std::pair<std::pair<int, int>, int> Gate::teleport_with_dir(
     // 모두 막혀있으면 게이트 좌표와 기존 방향 반환 (게임오버 처리)
     return {out_info.pos, in_dir};
 }
-
 std::pair<int, int> Gate::teleport(int x, int y) const {
     if (gate1.first == x && gate1.second == y)
         return gate2;
