@@ -22,8 +22,8 @@ void Contents::set_mission(int m_len, int m_growth, int m_poison, int m_gate,
 }
 
 void Contents::draw(int x, int y) const {
-     attron(COLOR_PAIR(9)); // 예: 10번 컬러페어(검정글자+흰배경) 사용
-   
+    attron(COLOR_PAIR(9)); // 검정글자+흰배경
+
     // Score Board
     mvprintw(y, x,   "Score Board");
     mvprintw(y+1, x, "B: %d / %d", cur_length, max_length);
@@ -37,4 +37,11 @@ void Contents::draw(int x, int y) const {
     mvprintw(y+8, x, "+: %d (%s)", mission_growth, mission_growth_ok ? "v" : " ");
     mvprintw(y+9, x, "-: %d (%s)", mission_poison, mission_poison_ok ? "v" : " ");
     mvprintw(y+10, x, "G: %d (%s)", mission_gate, mission_gate_ok ? "v" : " ");
+
+    // 모든 미션 달성 시 Game clear 출력
+    if (mission_len_ok && mission_growth_ok && mission_poison_ok && mission_gate_ok) {
+        mvprintw(y+12, x, "Game clear!");
+    }
+
+    attroff(COLOR_PAIR(9));
 }

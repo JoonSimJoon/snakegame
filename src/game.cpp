@@ -35,12 +35,11 @@ void Game::update_contents_val() {
 
 
 
-Game::Game()
-    : snake(), map(), is_running(false), score(0)
+Game::Game(int map_index, int tick_ms)
+    : snake(), map(23,23,map_index), is_running(false), score(0), tick_ms(tick_ms)
 {
     // 필요시 추가 초기화 코드 작성
 }
-
 
 void Game::init_screen() {
     initscr();               // ncurses 화면 초기화
@@ -323,20 +322,38 @@ void Game::spawn_poison() {
     }
 }
 
-
 void Game::game_over() {
     clear();
-    mvprintw(map.getHeight() / 2, (map.getWidth() - 9) , "GAME OVER");
+    mvprintw(map.getHeight() / 2, (map.getWidth() - 9), "GAME OVER");
     mvprintw(map.getHeight() / 2 + 1, (map.getWidth() - 15), "Press any key to exit...");
+
+    // 최종 점수 정보 출력
+    int info_y = map.getHeight() / 2 + 3;
+    mvprintw(info_y++, (map.getWidth() - 20), "최대 길이: %d", max_len);
+    mvprintw(info_y++, (map.getWidth() - 20), "B: %d / %d", cur_len, max_len);
+    mvprintw(info_y++, (map.getWidth() - 20), "Growth Item: %d", growth_cnt);
+    mvprintw(info_y++, (map.getWidth() - 20), "Poison Item: %d", poison_cnt);
+    mvprintw(info_y++, (map.getWidth() - 20), "Gate 사용: %d", gate_cnt);
+
+    // 게임 시간 출력
+    //static auto start_time = std::chrono::steady_clock::now();
+    auto end_time = std::chrono::steady_clock::now();
+    auto seconds = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+    mvprintw(info_y++, (map.getWidth() - 20), "게임 시간: %lld초", seconds);
+
     refresh();
     getch(); // 아무 키나 누를 때까지 대기
     endwin(); // ncurses 종료
     if(Quit) {
-        std::cout<<"강제종료\n";
+        std::cout << "강제종료\n";
     }
-    std::cout << "최종 점수: " << score << std::endl;
+    std::cout << "최대 길이: " << max_len << std::endl;
+    std::cout << "B: " << cur_len << " / " << max_len << std::endl;
+    std::cout << "Growth Item: " << growth_cnt << std::endl;
+    std::cout << "Poison Item: " << poison_cnt << std::endl;
+    std::cout << "Gate 사용: " << gate_cnt << std::endl;
+    std::cout << "게임 시간: " << seconds << "초" << std::endl;
 }
-
 
 
 bool Game::snake_alive() const {
@@ -347,7 +364,7 @@ void Game::run() {
     init_screen();
     nodelay(stdscr, TRUE);
     keypad(stdscr, TRUE);
-
+    start_time = std::chrono::steady_clock::now();
     is_running = true;
     while (is_running) {
         process_input();
@@ -364,8 +381,15 @@ void Game::run() {
             is_running = false;
             break;
         }
+        if (len_ok && growth_ok && poison_ok && gate_ok) {
+            update_screen(); // "Game clear!" 출력
+            refresh();
+            std::this_thread::sleep_for(std::chrono::seconds(5)); // 5초 대기
+            is_running = false;
+            break;
+        }
 
-        napms(100);
+        napms(tick_ms);
     }
     game_over();
 }

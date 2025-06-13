@@ -5,15 +5,17 @@
 #include <gate.hpp>
 // game.hpp에 멤버 변수 추가
 #include <chrono>
+#include <thread>
 extern std::pair<int, int> poison_pos;
 extern std::chrono::steady_clock::time_point poison_time;
 
 class Game {
 public:
-    Game();
+    Game(int map_index = 0, int tick_ms = 150);
     void run();
 
 private:
+    int tick_ms = 150;
     void init_screen();         // 화면 초기화
     void update_screen();       // 화면 갱신
     void process_input();       // 사용자 입력 처리
@@ -31,7 +33,8 @@ private:
     bool is_running;
     bool Quit=false;
     int score;
-
+    std::chrono::steady_clock::time_point start_time;
+    
     // 기타 상태 변수
 };
 
